@@ -1,4 +1,4 @@
-set(Test_SRCS AllTests.cpp BirthdayTest.cc)
+file(GLOB Test_SRCS "*.cpp" "*.cc")
 
 add_executable(cpp_otp_test ${Test_SRCS})
 

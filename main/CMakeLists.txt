@@ -1,4 +1,4 @@
-set(Main_SRCS main.cpp AuthenticationService.cpp ProfileDao.cpp RsaTokenDao.cpp Birthday.cpp)
+file(GLOB Main_SRCS "*.cpp")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(core ${Main_SRCS})
