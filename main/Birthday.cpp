@@ -1,5 +1,12 @@
 #include "Birthday.h"
+#include <ctime>
 
 bool Birthday::IsBirthday() {
-    return date::year_month_day().month() == date::month{4} && date::year_month_day().day() == date::day{9};
+    time_t currentTime;
+    time(&currentTime);
+    tm* localTime = localtime(&currentTime);
+
+    int currentDay = localTime->tm_mday;
+    int currentMonth = localTime->tm_mon + 1;
+    return currentDay == 9 && currentMonth == 4;
 }

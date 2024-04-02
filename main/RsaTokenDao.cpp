@@ -2,14 +2,15 @@
 #include <iomanip>
 #include <sstream>
 #include "RsaTokenDao.h"
+#include <ctime>
 
 using namespace std;
 
 std::string RsaTokenDao::getRandom(const std::string userName) {
-    srand((unsigned)time(nullptr));
+    srand((unsigned)time(NULL));
     ostringstream oss;
     oss << setw(6) << setfill('0') << rand() % 1000000;
-    auto result = oss.str();
+    std::string result = oss.str();
     cout << "randomCode:" << result << endl;
 
     return result;

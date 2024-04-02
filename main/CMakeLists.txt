@@ -1,7 +1,6 @@
-set(Main_SRCS main.cpp AuthenticationService.cpp ProfileDao.cpp RsaTokenDao.cpp Context.cpp Birthday.cpp)
+set(Main_SRCS main.cpp AuthenticationService.cpp ProfileDao.cpp RsaTokenDao.cpp Birthday.cpp)
 
-include_directories(.)
-
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(core ${Main_SRCS})
 add_executable(${CMAKE_PROJECT_NAME} main.cpp)
 target_link_libraries(${CMAKE_PROJECT_NAME} core)

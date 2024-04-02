@@ -1,3 +1,6 @@
 .idea
 cmake-build-debug
 build
+otp_tests
+otp
+cmake_build
