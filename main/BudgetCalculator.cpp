@@ -7,8 +7,8 @@ BudgetCalculator::BudgetCalculator(IBudgetDB &budgetDB) : budgetDB_(budgetDB) {
 
 bool BudgetCalculator::isAfter(const tm& tm1, const tm& tm2) {
     // Convert tm structures to time_t
-    std::time_t time1 = std::mktime(const_cast<std::tm*>(&tm1));
-    std::time_t time2 = std::mktime(const_cast<std::tm*>(&tm2));
+    time_t time1 = mktime(const_cast<tm*>(&tm1));
+    time_t time2 = mktime(const_cast<tm*>(&tm2));
 
     // Compare time_t values
     return time1 > time2;
@@ -16,8 +16,8 @@ bool BudgetCalculator::isAfter(const tm& tm1, const tm& tm2) {
 
 bool BudgetCalculator::isAfterOrSame(const tm& tm1, const tm& tm2) {
     // Convert tm structures to time_t
-    std::time_t time1 = std::mktime(const_cast<std::tm*>(&tm1));
-    std::time_t time2 = std::mktime(const_cast<std::tm*>(&tm2));
+    time_t time1 = mktime(const_cast<tm*>(&tm1));
+    time_t time2 = mktime(const_cast<tm*>(&tm2));
 
     // Compare time_t values
     return time1 >= time2;
@@ -25,8 +25,8 @@ bool BudgetCalculator::isAfterOrSame(const tm& tm1, const tm& tm2) {
 
 bool BudgetCalculator::isBefore(const tm& tm1, const tm& tm2) {
     // Convert tm structures to time_t
-    std::time_t time1 = std::mktime(const_cast<std::tm*>(&tm1));
-    std::time_t time2 = std::mktime(const_cast<std::tm*>(&tm2));
+    time_t time1 = mktime(const_cast<tm*>(&tm1));
+    time_t time2 = mktime(const_cast<tm*>(&tm2));
 
     // Compare time_t values
     return time1 < time2;
@@ -34,19 +34,19 @@ bool BudgetCalculator::isBefore(const tm& tm1, const tm& tm2) {
 
 bool BudgetCalculator::isBeforeOrSame(const tm& tm1, const tm& tm2) {
     // Convert tm structures to time_t
-    std::time_t time1 = std::mktime(const_cast<std::tm*>(&tm1));
-    std::time_t time2 = std::mktime(const_cast<std::tm*>(&tm2));
+    time_t time1 = mktime(const_cast<tm*>(&tm1));
+    time_t time2 = mktime(const_cast<tm*>(&tm2));
 
     // Compare time_t values
     return time1 <= time2;
 }
 
-uint32_t BudgetCalculator::query(const tm& start, const tm& end) {
+unsigned long BudgetCalculator::query(const tm& start, const tm& end) {
     if (isAfter(start, end)) {
         return 0;
     }
 
-    std::vector<IBudgetDB::Budget> allBudget = budgetDB_.findAll();
+    std::vector<Budget> allBudget = budgetDB_.findAll();
 
     BudgetRange budgetRange = filterBudgetList(allBudget, start, end);
 
@@ -60,68 +60,66 @@ uint32_t BudgetCalculator::query(const tm& start, const tm& end) {
     const tm& realStart = isAfter(firstDayOfFoundMonth, start) ? firstDayOfFoundMonth : start;
 
     if (budgetRange.start == budgetRange.end) {
-        uint32_t const average = calculateMonthAverage(*budgetRange.start);
+        const unsigned long average = calculateMonthAverage(*budgetRange.start);
 
-        uint32_t const days = calculateDaysBetweenDate(realStart, realEnd);
+        const unsigned long days = calculateDaysBetweenDate(realStart, realEnd);
 
         return average * days;
     }
 
-    uint32_t const startMonthAverage = calculateMonthAverage(*budgetRange.start);
+    const unsigned long startMonthAverage = calculateMonthAverage(*budgetRange.start);
     const tm& monthEnd = getLastDayOfMonth(budgetRange.start->getFirstDayOfMonth());
-    uint32_t const daysInFirstMonth = calculateDaysBetweenDate(realStart, monthEnd);
+    const unsigned long daysInFirstMonth = calculateDaysBetweenDate(realStart, monthEnd);
 
-    uint32_t const budgetFirstMonth = daysInFirstMonth * startMonthAverage;
+    const unsigned long budgetFirstMonth = daysInFirstMonth * startMonthAverage;
 
-    std::vector<IBudgetDB::Budget>::const_iterator it = budgetRange.start + 1U;
-    uint32_t budgetBetween = 0;
+    std::vector<Budget>::const_iterator it = budgetRange.start + 1U;
+    unsigned long budgetBetween = 0;
     while (it != budgetRange.end) {
         budgetBetween += it->money_;
         it++;
     }
 
-    uint32_t const endMonthAverage = calculateMonthAverage(*budgetRange.end);
+    const unsigned long endMonthAverage = calculateMonthAverage(*budgetRange.end);
     const tm& monthStart = getFirstDayOfMonth(budgetRange.end->getFirstDayOfMonth());
-    uint32_t const daysInLastMonth = calculateDaysBetweenDate(monthStart, realEnd);
+    const unsigned long daysInLastMonth = calculateDaysBetweenDate(monthStart, realEnd);
 
-    uint32_t const budgetEndMonth = daysInLastMonth * endMonthAverage;
+    const unsigned long budgetEndMonth = daysInLastMonth * endMonthAverage;
 
-    uint32_t const total = budgetFirstMonth + budgetBetween + budgetEndMonth;
+    const unsigned long total = budgetFirstMonth + budgetBetween + budgetEndMonth;
 
     return total;
 }
 
-uint32_t BudgetCalculator::calculateMonthAverage(IBudgetDB::Budget const &budget) {
+unsigned long BudgetCalculator::calculateMonthAverage(Budget const &budget) {
 
     const tm& lastDay = getLastDayOfMonth(budget.getFirstDayOfMonth());
     const tm& firstDay = getFirstDayOfMonth(budget.getFirstDayOfMonth());
-    uint32_t const days = calculateDaysBetweenDate(firstDay, lastDay);
+    const unsigned long days = calculateDaysBetweenDate(firstDay, lastDay);
     return budget.money_ / days;
 }
 
-uint32_t BudgetCalculator::calculateDaysBetweenDate(const tm& start,
-                                                    const tm& end) {
+unsigned long BudgetCalculator::calculateDaysBetweenDate(const tm& start, const tm& end) {
     // Convert tm structures to time_t
-    std::time_t time1 = std::mktime(const_cast<std::tm*>(&end));
-    std::time_t time2 = std::mktime(const_cast<std::tm*>(&start));
+    time_t time1 = mktime(const_cast<tm*>(&end));
+    time_t time2 = mktime(const_cast<tm*>(&start));
 
     // Calculate the difference in seconds
     double seconds = difftime(time1, time2);
 
     // Convert seconds to days
-    return static_cast<uint32_t>(seconds / (60 * 60 * 24));
+    return static_cast<unsigned long>(seconds / (60 * 60 * 24));
 }
 
 BudgetCalculator::BudgetRange
-BudgetCalculator::filterBudgetList(const std::vector<IBudgetDB::Budget> &allBudget, const tm& start,
-                                   const tm& end) {
+BudgetCalculator::filterBudgetList(const std::vector<Budget> &allBudget, const tm& start, const tm& end) {
     BudgetRange budgetRange;
     const tm& startMonth = getFirstDayOfMonth(start);
     const tm& endMonth = getFirstDayOfMonth(end);
     budgetRange.start = allBudget.end();
     budgetRange.end = allBudget.end();
     bool foundStart = false;
-    std::vector<IBudgetDB::Budget>::const_iterator it = allBudget.begin();
+    std::vector<Budget>::const_iterator it = allBudget.begin();
     while (it != allBudget.end()) {
         if ((!foundStart) && (isAfterOrSame(it->getFirstDayOfMonth(), startMonth))) {
             budgetRange.start = it;
@@ -140,7 +138,7 @@ BudgetCalculator::filterBudgetList(const std::vector<IBudgetDB::Budget> &allBudg
 
 tm BudgetCalculator::getLastDayOfMonth(const tm& date) {
     // Create a copy of the input tm structure to modify
-    std::tm lastDayTm = date;
+    tm lastDayTm = date;
 
     // Set tm_mday to 0, which is treated as the day before the first day of the month
     lastDayTm.tm_mday = 0;
@@ -150,7 +148,7 @@ tm BudgetCalculator::getLastDayOfMonth(const tm& date) {
 
     // Normalize the tm structure to get the last day of the input month
     // mktime adjusts the tm_mday to the last day of the previous month if tm_mday is set to 0
-    std::mktime(&lastDayTm);
+    mktime(&lastDayTm);
 
     // Now, lastDayTm.tm_mday is the last day of the input month
     return lastDayTm;
@@ -158,13 +156,13 @@ tm BudgetCalculator::getLastDayOfMonth(const tm& date) {
 
 tm BudgetCalculator::getFirstDayOfMonth(const tm& date) {
     // Create a copy of the input tm structure to modify
-    std::tm firstDayTm = date;
+    tm firstDayTm = date;
 
     // Set tm_mday to 1, which is the first day of the month
     firstDayTm.tm_mday = 1;
 
     // Normalize the tm structure to get the first day of the input month
-    std::mktime(&firstDayTm);
+    mktime(&firstDayTm);
 
     // Now, firstDayTm.tm_mday is the first day of the input month
     return firstDayTm;

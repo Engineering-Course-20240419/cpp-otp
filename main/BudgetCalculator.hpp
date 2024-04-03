@@ -6,16 +6,16 @@ class BudgetCalculator {
 public:
   BudgetCalculator(IBudgetDB &budgetDB);
 
-  uint32_t query(const tm& start, const tm& end);
+  unsigned long query(const tm& start, const tm& end);
 
 private:
   struct BudgetRange {
-    std::vector<IBudgetDB::Budget>::const_iterator start;
-    std::vector<IBudgetDB::Budget>::const_iterator end;
+    std::vector<Budget>::const_iterator start;
+    std::vector<Budget>::const_iterator end;
   };
-  static uint32_t calculateMonthAverage(IBudgetDB::Budget const &budget);
-  static uint32_t calculateDaysBetweenDate(const tm& start, const tm& end);
-  static BudgetRange filterBudgetList(std::vector<IBudgetDB::Budget> const &allBudget, const tm& start, const tm& end);
+  static unsigned long calculateMonthAverage(Budget const &budget);
+  static unsigned long calculateDaysBetweenDate(const tm& start, const tm& end);
+  static BudgetRange filterBudgetList(std::vector<Budget> const &allBudget, const tm& start, const tm& end);
   static tm getLastDayOfMonth(const tm& date);
   static tm getFirstDayOfMonth(const tm& date);
   bool isAfter(const tm& tm1, const tm& tm2);
