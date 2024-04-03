@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CPP_OTP_BUDGET_H
+#define CPP_OTP_BUDGET_H
 
 #include <vector>
 
@@ -16,13 +17,7 @@ public:
 
 class IBudgetDB {
 public:
-    virtual std::vector<Budget> findAll() = 0; // fixme std::bad_alloc?
+    virtual std::vector<Budget> findAll() = 0;
 };
 
-tm Budget::getFirstDayOfMonth() const {
-    tm firstDay = tm();
-    firstDay.tm_year = budgetMonth_year - 1900;
-    firstDay.tm_mon = budgetMonth_month - 1;
-    firstDay.tm_mday = 1;
-    return firstDay;
-}
+#endif //CPP_OTP_BUDGET_H

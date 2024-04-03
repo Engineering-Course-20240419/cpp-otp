@@ -1,6 +1,7 @@
 #include "BudgetCalculator.hpp"
 #include <vector>
 #include "IBudgetDB.hpp"
+#include <iostream>
 
 BudgetCalculator::BudgetCalculator(IBudgetDB &budgetDB) : budgetDB_(budgetDB) {
 }
@@ -73,7 +74,7 @@ unsigned long BudgetCalculator::query(const tm& start, const tm& end) {
 
     const unsigned long budgetFirstMonth = daysInFirstMonth * startMonthAverage;
 
-    std::vector<Budget>::const_iterator it = budgetRange.start + 1U;
+    std::vector<Budget>::const_iterator it = budgetRange.start+1u;
     unsigned long budgetBetween = 0;
     while (it != budgetRange.end) {
         budgetBetween += it->money_;
@@ -108,7 +109,7 @@ unsigned long BudgetCalculator::calculateDaysBetweenDate(const tm& start, const 
     double seconds = difftime(time1, time2);
 
     // Convert seconds to days
-    return static_cast<unsigned long>(seconds / (60 * 60 * 24));
+    return static_cast<unsigned long>(seconds / (60 * 60 * 24)) + 1;
 }
 
 BudgetCalculator::BudgetRange

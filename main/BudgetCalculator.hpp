@@ -1,3 +1,6 @@
+#ifndef CPP_OTP_BUDGET_CALCULATOR_H
+#define CPP_OTP_BUDGET_CALCULATOR_H
+
 #include <ctime>
 #include "IBudgetDB.hpp"
 
@@ -25,3 +28,5 @@ private:
   IBudgetDB &budgetDB_;
 
 };
+
+#endif //CPP_OTP_BUDGET_CALCULATOR_H
