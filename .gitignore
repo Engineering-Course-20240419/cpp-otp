@@ -1,6 +1,6 @@
 .idea
 cmake-build-debug
-build
+/build/
 otp_tests
 otp
 cmake_build
