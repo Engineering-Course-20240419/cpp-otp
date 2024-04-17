@@ -2,34 +2,12 @@
 #include "CppUTestExt/MockSupport.h"
 #include "AuthenticationService.h"
 
-TEST_GROUP(AuthenticationService) {
-    void teardown() {
-        mock().clear();
-    }
-};
-
-//class StubProfileDao : public ProfileDao {
-//public:
-//    std::string getPassword(std::string userName) {
-//        return password;
-//    }
-//    std::string password;
-//};
-
 class StubProfileDao : public ProfileDao {
 public:
     std::string getPassword(std::string userName) {
         return mock().actualCall("getPassword").returnStringValue();
     }
 };
-
-//class StubRsaTokenDao : public RsaTokenDao {
-//public:
-//    std::string getRandom(std::string userName) {
-//        return token;
-//    }
-//    std::string token;
-//};
 
 class StubRsaTokenDao : public RsaTokenDao {
 public:
@@ -38,44 +16,6 @@ public:
     }
 };
 
-TEST(AuthenticationService, IsValid) {
-    StubProfileDao stubProfileDao;
-//    stubProfileDao.password = "91";
-    mock().expectOneCall("getPassword").andReturnValue("91");
-    StubRsaTokenDao stubRsaTokenDao;
-//    stubRsaTokenDao.token = "000000";
-    mock().expectOneCall("getRandom").andReturnValue("000000");
-    Logger logger;
-    AuthenticationService target = AuthenticationService(stubProfileDao, stubRsaTokenDao, logger);
-
-    bool actual = target.isValid("joey", "91000000");
-
-    CHECK_TRUE(actual);
-}
-
-TEST(AuthenticationService, IsNotValid) {
-    StubProfileDao stubProfileDao;
-//    stubProfileDao.password = "91";
-    mock().expectOneCall("getPassword").andReturnValue("91");
-    StubRsaTokenDao stubRsaTokenDao;
-//    stubRsaTokenDao.token = "123456";
-    mock().expectOneCall("getRandom").andReturnValue("123456");
-    Logger logger;
-    AuthenticationService target = AuthenticationService(stubProfileDao, stubRsaTokenDao, logger);
-
-    bool actual = target.isValid("joey", "91000000");
-
-    CHECK_FALSE(actual);
-}
-
-//class MockLogger : public Logger {
-//public:
-//    void log(std::string message) {
-//        _message = message;
-//    }
-//    std::string _message;
-//};
-
 class MockLogger : public Logger {
 public:
     void log(std::string message) {
@@ -83,20 +23,52 @@ public:
     }
 };
 
+TEST_GROUP(AuthenticationService) {
+    StubProfileDao stubProfileDao;
+    StubRsaTokenDao stubRsaTokenDao;
+    MockLogger mockLogger;
+    AuthenticationService* target;
+    void setup() {
+        target = new AuthenticationService(stubProfileDao, stubRsaTokenDao, mockLogger);
+        mock().ignoreOtherCalls();
+    }
+    void teardown() {
+        mock().clear();
+        delete target;
+        target = NULL;
+    }
+    void givenPassword(const char * password) {
+        mock().expectOneCall("getPassword").andReturnValue(password);
+    }
+    void givenToken(const char * token) {
+        mock().expectOneCall("getRandom").andReturnValue(token);
+    }
+};
+
+TEST(AuthenticationService, IsValid) {
+    givenPassword("91");
+    givenToken("000000");
+
+    bool actual = target->isValid("joey", "91000000");
+
+    CHECK_TRUE(actual);
+}
+
+TEST(AuthenticationService, IsNotValid) {
+    givenPassword("91");
+    givenToken("123456");
+
+    bool actual = target->isValid("joey", "91000000");
+
+    CHECK_FALSE(actual);
+}
 
 TEST(AuthenticationService, Log) {
-    StubProfileDao stubProfileDao;
-//    stubProfileDao.password = "91";
-    mock().expectOneCall("getPassword").andReturnValue("91");
-    StubRsaTokenDao stubRsaTokenDao;
-//    stubRsaTokenDao.token = "123456";
-    mock().expectOneCall("getRandom").andReturnValue("123456");
-    MockLogger mockLogger;
+    givenPassword("91");
+    givenToken("123456");
     mock().expectOneCall("log").withStringParameter("message", "invalid login: joey");
-    AuthenticationService target = AuthenticationService(stubProfileDao, stubRsaTokenDao, mockLogger);
 
-    target.isValid("joey", "91000000");
+    target->isValid("joey", "91000000");
 
     mock().checkExpectations();
-//    STRCMP_EQUAL("invalid login: joey", mockLogger._message.c_str());
 }
