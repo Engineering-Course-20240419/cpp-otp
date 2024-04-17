@@ -27,7 +27,8 @@ TEST(AuthenticationService, IsValid) {
     stubProfileDao.password = "91";
     StubRsaTokenDao stubRsaTokenDao;
     stubRsaTokenDao.token = "000000";
-    AuthenticationService target = AuthenticationService(stubProfileDao, stubRsaTokenDao);
+    Logger logger;
+    AuthenticationService target = AuthenticationService(stubProfileDao, stubRsaTokenDao, logger);
 
     bool actual = target.isValid("joey", "91000000");
 
@@ -39,10 +40,31 @@ TEST(AuthenticationService, IsNotValid) {
     stubProfileDao.password = "91";
     StubRsaTokenDao stubRsaTokenDao;
     stubRsaTokenDao.token = "123456";
-    AuthenticationService target = AuthenticationService(stubProfileDao, stubRsaTokenDao);
+    Logger logger;
+    AuthenticationService target = AuthenticationService(stubProfileDao, stubRsaTokenDao, logger);
 
     bool actual = target.isValid("joey", "91000000");
 
     CHECK_FALSE(actual);
 }
 
+class MockLogger : public Logger {
+public:
+    void log(std::string message) {
+        _message = message;
+    }
+    std::string _message;
+};
+
+TEST(AuthenticationService, Log) {
+    StubProfileDao stubProfileDao;
+    stubProfileDao.password = "91";
+    StubRsaTokenDao stubRsaTokenDao;
+    stubRsaTokenDao.token = "123456";
+    MockLogger mockLogger;
+    AuthenticationService target = AuthenticationService(stubProfileDao, stubRsaTokenDao, mockLogger);
+
+    target.isValid("joey", "91000000");
+
+    STRCMP_EQUAL("invalid login: joey", mockLogger._message.c_str());
+}

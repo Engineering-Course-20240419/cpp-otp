@@ -6,8 +6,9 @@
 #include "AuthenticationService.h"
 #include "ProfileDao.h"
 #include "RsaTokenDao.h"
+#include "Logger.h"
 
-AuthenticationService::AuthenticationService(ProfileDao& profileDao, RsaTokenDao& rsaTokenDao) : profileDao(profileDao), rsaTokenDao(rsaTokenDao) {
+AuthenticationService::AuthenticationService(ProfileDao& profileDao, RsaTokenDao& rsaTokenDao, Logger& logger) : profileDao(profileDao), rsaTokenDao(rsaTokenDao), logger(logger) {
 
 }
 
@@ -22,6 +23,7 @@ bool AuthenticationService::isValid(const std::string userName, const std::strin
     if (isValid) {
         return true;
     } else {
+        logger.log("invalid login: " + userName);
         return false;
     }
 }
