@@ -3,7 +3,8 @@
 #include "AuthenticationService.h"
 
 int main() {
-    Birthday birthday;
+    Today today;
+    Birthday birthday = Birthday(today);
     std::cout << "is birthday: " << birthday.IsBirthday() << std::endl;
     return 0;
 }
