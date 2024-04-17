@@ -68,13 +68,21 @@ TEST(AuthenticationService, IsNotValid) {
     CHECK_FALSE(actual);
 }
 
+//class MockLogger : public Logger {
+//public:
+//    void log(std::string message) {
+//        _message = message;
+//    }
+//    std::string _message;
+//};
+
 class MockLogger : public Logger {
 public:
     void log(std::string message) {
-        _message = message;
+        mock().actualCall("log").withStringParameter("message", message.c_str());
     }
-    std::string _message;
 };
+
 
 TEST(AuthenticationService, Log) {
     StubProfileDao stubProfileDao;
@@ -84,9 +92,11 @@ TEST(AuthenticationService, Log) {
 //    stubRsaTokenDao.token = "123456";
     mock().expectOneCall("getRandom").andReturnValue("123456");
     MockLogger mockLogger;
+    mock().expectOneCall("log").withStringParameter("message", "invalid login: joey");
     AuthenticationService target = AuthenticationService(stubProfileDao, stubRsaTokenDao, mockLogger);
 
     target.isValid("joey", "91000000");
 
-    STRCMP_EQUAL("invalid login: joey", mockLogger._message.c_str());
+    mock().checkExpectations();
+//    STRCMP_EQUAL("invalid login: joey", mockLogger._message.c_str());
 }
