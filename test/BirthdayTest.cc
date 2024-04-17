@@ -3,27 +3,42 @@
 #include "CppUTestExt/MockSupport.h"
 
 TEST_GROUP(Birthday) {
-
+    void teardown() {
+        mock().clear();
+    }
 };
+
+//class StubToday : public Today {
+//public:
+//    tm* getToday() {
+//        time_t currentTime;
+//        time(&currentTime);
+//        tm* today = localtime(&currentTime);
+//        today->tm_mon = month - 1;
+//        today->tm_mday = day;
+//        return today;
+//    }
+//    int month;
+//    int day;
+//};
 
 class StubToday : public Today {
 public:
     tm* getToday() {
-        time_t currentTime;
-        time(&currentTime);
-        tm* today = localtime(&currentTime);
-        today->tm_mon = month - 1;
-        today->tm_mday = day;
-        return today;
+        return (tm*) (mock().actualCall("getToday").returnPointerValue());
     }
-    int month;
-    int day;
 };
 
 TEST(Birthday, IsBirthday) {
     StubToday stubToday;
-    stubToday.month = 4;
-    stubToday.day = 9;
+//    stubToday.month = 4;
+//    stubToday.day = 9;
+    time_t currentTime;
+    time(&currentTime);
+    tm* today = localtime(&currentTime);
+    today->tm_mon = 4 - 1;
+    today->tm_mday = 9;
+    mock().expectOneCall("getToday").andReturnValue(today);
     Birthday target = Birthday(stubToday);
 
     bool actual = target.IsBirthday();
@@ -33,8 +48,14 @@ TEST(Birthday, IsBirthday) {
 
 TEST(Birthday, IsNotBirthday) {
     StubToday stubToday;
-    stubToday.month = 5;
-    stubToday.day = 20;
+//    stubToday.month = 5;
+//    stubToday.day = 20;
+    time_t currentTime;
+    time(&currentTime);
+    tm* today = localtime(&currentTime);
+    today->tm_mon = 5 - 1;
+    today->tm_mday = 20;
+    mock().expectOneCall("getToday").andReturnValue(today);
     Birthday target = Birthday(stubToday);
 
     bool actual = target.IsBirthday();
