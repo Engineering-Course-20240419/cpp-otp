@@ -8,7 +8,8 @@ class ProfileDao {
 
 public:
     ProfileDao();
-    std::string getPassword(std::string userName);
+    virtual std::string getPassword(std::string userName);
+    virtual ~ProfileDao();
 
 private:
     std::map<std::string, std::string> profiles;

@@ -7,11 +7,13 @@
 #include "ProfileDao.h"
 #include "RsaTokenDao.h"
 
+AuthenticationService::AuthenticationService(ProfileDao& profileDao, RsaTokenDao& rsaTokenDao) : profileDao(profileDao), rsaTokenDao(rsaTokenDao) {
+
+}
+
 bool AuthenticationService::isValid(const std::string userName, const std::string password) {
-    ProfileDao profileDao;
     std::string passwordFromDao = profileDao.getPassword(userName);
 
-    RsaTokenDao rsaTokenDao;
     std::string randomCode = rsaTokenDao.getRandom(userName);
 
     std::string validPassword = passwordFromDao + randomCode;

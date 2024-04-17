@@ -8,3 +8,5 @@ ProfileDao::ProfileDao() {
 std::string ProfileDao::getPassword(const std::string userName) {
     return profiles[userName];
 }
+
+ProfileDao::~ProfileDao() {}
