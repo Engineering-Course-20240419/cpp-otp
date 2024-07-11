@@ -4,3 +4,7 @@ cmake-build-debug
 otp_tests
 otp
 cmake_build
+
+# code coverage
+report
+coverage.info

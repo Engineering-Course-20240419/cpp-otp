@@ -19,6 +19,12 @@ Build and run the program:
 make main
 ```
 
+Get the coverage report (run below on the machine with lcov):
+```shell
+lcov --capture --directory build/test-obj/main --output-file coverage.info --ignore-errors range --exclude '/usr/*'
+genhtml coverage.info --output-directory report --ignore-errors range
+```
+
 # VC++ 6.0
 
 Please make sure you have `cmake` and `VC++ 6.0` installed
