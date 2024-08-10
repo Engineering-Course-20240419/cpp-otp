@@ -42,3 +42,8 @@ Run the program:
 cd main
 cpp_otp.exe
 ```
+
+To get the code coverage report, first install OpenCppCoverage https://github.com/OpenCppCoverage/OpenCppCoverage, then run:
+```shell
+OpenCppCoverage.exe --sources main --modules cmake_build -- .\cmake_build\test\cpp_otp_test.exe
+```
